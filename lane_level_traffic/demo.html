@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+	<head>
+    	<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    	<meta charset="utf-8">
+    	<title>Traffic Demo</title>
+    	<style>
+      		html, body, #map-canvas {
+        		height: 100%;
+        		margin: 0px;
+        		padding: 0px
+      		}	
+      		#metrics { position: absolute; bottom: 10px; right: 10px; z-index: 99; }
+    	</style>
+    	<script type="text/javascript"
+      		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCHAZ6o2QYo78U1Z0gbRzhIYm4dG9dy7mQ&sensor=false">
+    	</script>
+    	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  
+<!--   	
+    	<script 
+   			src="/cgi-bin/script.cgi?TrafficData&datadir" 
+   			type="text/javascript" 
+   			language="JavaScript">
+		</script>
+		
+		<script type="text/javascript">
+			xmlhttp=new XMLHttpRequest();
+			xmlhttp.open('POST','trafficData.cgi',true);
+			xmlhttp.send('accountID=John&data=test');
+		</script>
+-->
+    	
+    	<script>
+			var traffic;
+			var arrows;
+			var map;
+			
+			function initialize() 
+			{
+  				var mapOptions = 
+  				{
+    				center: new google.maps.LatLng(42.353570, -71.116958),
+    				zoom: 20,
+    				mapTypeId: google.maps.MapTypeId.SATELLITE,
+    				tilt: 0
+  				};
+  				map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);  
+  				
+  				var boundaryCoords = [
+  					new google.maps.LatLng(42.353270, -71.116681),
+  					new google.maps.LatLng(42.353491, -71.116472),
+  					new google.maps.LatLng(42.353492, -71.116467),
+  					new google.maps.LatLng(42.353737, -71.116928),
+  					new google.maps.LatLng(42.353877, -71.117156),
+  					new google.maps.LatLng(42.353877, -71.117161),
+  					new google.maps.LatLng(42.353676, -71.117402),
+  					new google.maps.LatLng(42.353520, -71.117151),
+  					new google.maps.LatLng(42.353406, -71.116946),
+  					new google.maps.LatLng(42.353270, -71.116681)
+  				];
+  				var medianCoords = [
+  					new google.maps.LatLng(42.353383, -71.116575),
+  					new google.maps.LatLng(42.353522, -71.116836),
+  					new google.maps.LatLng(42.353633, -71.117035),
+  					new google.maps.LatLng(42.353776, -71.117276)
+  				];
+  								
+  				var r1Coords = 
+  				[
+					new google.maps.LatLng(42.353397, -71.116555),
+  					new google.maps.LatLng(42.353540, -71.116820),
+					new google.maps.LatLng(42.353650, -71.117019),
+  					new google.maps.LatLng(42.353794, -71.117253)
+    			];
+    			
+    			var r2Coords = 
+    			[
+    			  	new google.maps.LatLng(42.353426, -71.116529),
+  					new google.maps.LatLng(42.353566, -71.116793),
+  					new google.maps.LatLng(42.353676, -71.116991),
+  					new google.maps.LatLng(42.353820, -71.117224)
+    			];
+    			
+    			var r3Coords =
+    			[
+    			  	new google.maps.LatLng(42.353453, -71.116502),
+  					new google.maps.LatLng(42.353592, -71.116771),
+  					new google.maps.LatLng(42.353701, -71.116965),
+  					new google.maps.LatLng(42.353843, -71.117197)
+    			];
+    			
+    			var r4Coords =
+    			[
+    			    new google.maps.LatLng(42.353477, -71.116482),
+    				new google.maps.LatLng(42.353614, -71.116747),
+    				new google.maps.LatLng(42.353724, -71.116942),
+    				new google.maps.LatLng(42.353865, -71.117170)
+    			];
+    			var l1Coords = 
+    			[
+	    			new google.maps.LatLng(42.353758, -71.117299),
+    				new google.maps.LatLng(42.353609, -71.117058),
+    				new google.maps.LatLng(42.353500, -71.116856),
+    				new google.maps.LatLng(42.353362, -71.116590),				
+    			];
+    			var l2Coords =
+    			[
+    				new google.maps.LatLng(42.353733, -71.117329),
+    				new google.maps.LatLng(42.353583, -71.117086),
+    				new google.maps.LatLng(42.353470, -71.116883),
+    				new google.maps.LatLng(42.353332, -71.116619)
+    			];	
+    			var l3Coords = 
+    			[
+	    			new google.maps.LatLng(42.353708, -71.117359),
+	    			new google.maps.LatLng(42.353557, -71.117113),
+	    			new google.maps.LatLng(42.353444, -71.116909),
+    				new google.maps.LatLng(42.353305, -71.116643)
+    			];
+    			var l4Coords =
+    			[
+        			new google.maps.LatLng(42.353685, -71.117388),
+        			new google.maps.LatLng(42.353533, -71.117139),
+        			new google.maps.LatLng(42.353419, -71.116934),
+					new google.maps.LatLng(42.353280, -71.116667)
+    			];
+    			
+				var greenArrow = 
+				{
+    				path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+    				scale: 3.5,
+				    strokeColor: 'green'
+  				};
+  				var yellowArrow =
+  				{
+  					path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+  					scale: 3.5,
+  					strokeColor: 'yellow'	
+  				};
+  				var orangeArrow =
+  				{
+  					path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+  					scale: 3.5,
+  					strokeColor: 'orange'
+  				};
+  				var redArrow =
+  				{
+  					path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+  					scale: 3.5,
+  					strokeColor: 'red'
+  				};	
+  				arrows = {'red' : redArrow, 'yellow' : yellowArrow, 'orange' : orangeArrow, 'green' : greenArrow};
+  					
+  				// Markings
+  				  	var boundary = new google.maps.Polyline({
+  					path: boundaryCoords,
+  					strokeWeight: 5,
+  					strokeColor: 'white',
+  					map: map
+  				}); 		
+  				var median = new google.maps.Polyline({
+  					path: medianCoords,
+  					strokeWeight: 10,
+  					strokeColor: 'white',
+  					map: map
+  				});				
+  					
+  				// Create Lanes
+  				var laneR1 = new google.maps.Polyline({
+    				path: r1Coords,
+    				//strokeWeight: 5,
+    				icons: 
+    				[
+    					{
+      						icon: greenArrow,
+      						repeat: '75%'
+    					}
+    				],
+    				map: map
+  				});
+  				var laneR2 = new google.maps.Polyline({
+    				path: r2Coords,
+      				//strokeWeight: 0,
+    				icons: 
+    				[
+    					{
+      						icon: redArrow,
+      						repeat: '10%'
+    					}
+    				],
+    				map: map
+  				});
+  				var laneR3 = new google.maps.Polyline({
+    				path: r3Coords,
+    				//strokeWeight: 0,
+    				icons: 
+    				[
+    					{
+      						icon: yellowArrow,
+      						repeat: '22%'
+    					}
+    				],
+    				map: map
+  				});
+  				var laneR4 = new google.maps.Polyline({
+    				path: r4Coords,
+      				//strokeWeight: 0,
+    				icons: 
+    				[
+    					{
+      						icon: greenArrow,
+      						repeat: '98%'
+    					}
+    				],
+    				map: map
+  				});
+  				var laneL1 = new google.maps.Polyline({
+  					path: l1Coords,
+      				//strokeWeight: 0,
+  					icons:
+  					[
+  						{
+  							icon: greenArrow,
+  							repeat: '50%'
+  						}
+  					],
+  					map: map
+  				});
+  				var laneL2 = new google.maps.Polyline({
+  					path: l2Coords,
+      				//strokeWeight: 0,
+  					icons:
+  					[
+  						{
+  							icon: yellowArrow,
+  							repeat: '35%'
+  						}
+  					],
+  					map: map
+  				}); 	
+  				var laneL3 = new google.maps.Polyline({
+  					path: l3Coords,
+      				//strokeWeight: 0,  					
+  					icons:
+  					[
+  						{
+  							icon: yellowArrow,
+  							repeat: '21%'
+  						}
+  					],
+  					map: map
+  				}); 		
+  				var laneL4 = new google.maps.Polyline({
+  					path: l4Coords,
+      				//strokeWeight: 0,  					
+  					icons:
+  					[
+  						{
+  							icon: greenArrow,
+  							repeat: '88%'
+  						}
+  					],
+  					map: map
+  				}); 		
+  				
+  				traffic = 
+  				[
+  					{'lane' : laneL1, 'speed' : 73},
+  					{'lane' : laneL2, 'speed' : 61},
+  					{'lane' : laneL3, 'speed' : 39},
+  					{'lane' : laneL4, 'speed' : 58},
+  					{'lane' : laneR1, 'speed' : 80},
+  					{'lane' : laneR2, 'speed' : 32},
+  					{'lane' : laneR3, 'speed' : 45},
+  					{'lane' : laneR4, 'speed' : 52}
+  				]
+  				for(var i in traffic) {
+  					var t = traffic[i]
+  					setUpMetrics(t);
+  				}
+  				visualizeTraffic(traffic);
+			}
+			
+			function visualizeTraffic(traffic) 
+			{
+				var count = 0;
+    			window.setInterval(function() {
+    				for(var i in traffic) {
+    					count += 1 % 200;
+						var icons = traffic[i].lane.get('icons');
+      					icons[0].offset = (count / (100-traffic[i].speed)) + '%';
+				    	traffic[i].lane.set('icons', icons);
+    				}
+  				}, 10);
+  				
+  				window.setInterval( function update() {
+  					console.log("UPDATE");
+  					// lane number, speed, repeat, icon
+  					//updateLane(0, 10, 10, 10);
+  				}, 10000);
+			}
+			
+			function updateLane(lane, speed, repeat, flow) {
+				traffic[lane].speed = speed;
+				if(flow < 25) { traffic[lane].lane.get('icons')[0].icon = arrows.redArrow; }
+				if(flow >= 25 && flow < 75) { traffic[lane].lane.get('icons')[0].icon = arrows.yellowArrow; }
+				if(flow >=75) { traffic[lane].lane.get('icons')[0].icon = arrows.greenArrow; }
+				traffic[lane].lane.get('icons')[0].repeat = repeat + '%';
+			}
+
+// ------------------------------------ CHARTS ----------------------------------------
+			function setUpMetrics(t) {
+				var lane = t.lane;
+				var speed = t.speed;
+				var flow = 0;
+				var arrow = lane.get('icons')[0].icon;
+				var density = parseInt(lane.get('icons')[0].repeat);
+				if(arrow.strokeColor== 'red') {
+					flow = 25;
+				} else if (arrow.strokeColor == 'yellow') {
+					flow = 50;
+				} else if (arrow.strokeColor == 'green') {
+					flow = 100;
+				} 
+				google.maps.event.addListener(lane, 'click', function() {
+					lane.setOptions({strokeColor: 'blue'});
+					for(var i in traffic) {
+						if(traffic[i].lane != lane) {
+							traffic[i].lane.setOptions({strokeColor: 'black'});
+						}
+					}
+					drawChart(speed, density, flow);
+				});		
+			}
+			
+			function drawChart(speed, density, flow) {
+				var data = google.visualization.arrayToDataTable([
+					// speed: red:[0-25] yellow:[25-50] green:[50-100]
+					// density: red:[0-25] yellow:[25-50] green:[50-100] 
+          			['Label', 'Value'],
+          			['Speed', speed],
+          			['Density', density],
+          			['Flow', flow]
+        		]);
+        		var options = {
+          			width: 500, height: 250,
+          			greenFrom: 50, greenTo: 100,
+          			yellowFrom:25, yellowTo: 50,
+          			redFrom: 0, redTo: 25,
+          			minorTicks: 5
+        		};
+        		var chart = new google.visualization.Gauge(document.getElementById('metrics'));
+       	 		chart.draw(data, options);
+      		}
+			
+			google.maps.event.addDomListener(window, 'load', initialize);
+			google.load('visualization', '1', {packages:['gauge']});
+		</script>
+	</head>
+	<body>
+    	<div id="map-canvas"></div>
+    	<div id="metrics"></div>
+  	</body>
+</html>

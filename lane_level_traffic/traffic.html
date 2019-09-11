@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    	<style type="text/css">
+      		html { height: 100% }
+      		body { height: 100%; margin: 0; padding: 0 }
+      		#map-canvas { height: 100% }
+    	</style>
+    	<script type="text/javascript"
+      		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCHAZ6o2QYo78U1Z0gbRzhIYm4dG9dy7mQ&sensor=false">
+    	</script>
+    	<script type="text/javascript" src="http://www.geocodezip.com/scripts/v3_epoly.js"></script>
+
+
+    	<script type="text/javascript">
+    	
+    		google.maps.event.addDomListener(window, 'load', initialize);
+    	
+			var map;
+			var path;
+			var marker;
+			function initialize() {
+  				var myLatlng = new google.maps.LatLng(42.353570, -71.116958);
+  				var myOptions = {
+    				zoom: 20,
+    				center: myLatlng,
+    				mapTypeId: google.maps.MapTypeId.SATELLITE,
+    				tilt: 0
+  				}
+  				map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+    		
+    			// Lane Paths
+  				rightRoadOuterRightLane = new google.maps.Polyline({
+    				path: [
+    					new google.maps.LatLng(42.353477, -71.116482),
+    					new google.maps.LatLng(42.353614, -71.116747),
+    					new google.maps.LatLng(42.353724, -71.116942),
+    					new google.maps.LatLng(42.353865, -71.117170)
+    				],
+    				map:map
+					//strokeColor: '#FF0000',
+    				//strokeOpacity: 0.00001,
+    				//strokeWeight: 0
+  				});
+  				rightRoadInnerRightLane = new google.maps.Polyline({
+  					path: [
+  						new google.maps.LatLng(42.353453, -71.116502),
+  						new google.maps.LatLng(42.353592, -71.116771),
+  						new google.maps.LatLng(42.353701, -71.116965),
+  						new google.maps.LatLng(42.353843, -71.117197)
+  					],
+  					map:map
+  				});
+  				rightRoadInnerLeftLane = new google.maps.Polyline({
+  					path: [
+  						new google.maps.LatLng(42.353426, -71.116529),
+  						new google.maps.LatLng(42.353566, -71.116793),
+  						new google.maps.LatLng(42.353676, -71.116991),
+  						new google.maps.LatLng(42.353820, -71.117224)
+  					],
+  					map:map
+  				});
+  				rightRoadOuterLeftLane = new google.maps.Polyline({
+  					path: [
+  						new google.maps.LatLng(42.353397, -71.116555),
+  						new google.maps.LatLng(42.353540, -71.116820),
+  						new google.maps.LatLng(42.353650, -71.117019),
+  						new google.maps.LatLng(42.353794, -71.117253)
+  					],
+  					map:map
+  				});
+  				
+  				var lineSymbol = {
+  			  		path: google.maps.SymbolPath.CIRCLE,
+    				scale: 8,
+    				strokeColor: '#393'
+  				};
+  				
+  				car = new google.maps.Marker ({
+    				map: map
+    				//icon:'http://www.exploratorium.edu/sites/default/files/location-page/tCar.png'
+  				});
+  				car2 = new google.maps.Marker ({
+  					map: map
+  				});
+  				truck = new google.maps.Marker ({
+    				map: map
+    				//icon:'http://www.exploratorium.edu/sites/default/files/location-page/tCar.png'
+  				});
+  	
+  			  	animate();
+  			  	
+			}    
+			
+			function animate() {
+			
+				car.setPosition(rightRoadInnerRightLane.getPath().getAt(0));
+				car2.setPosition(rightRoadInnerRightLane.getPath().getAt(0));
+				truck.setPosition(rightRoadOuterRightLane.getPath().getAt(0));
+				
+				carPos = 0;
+				car2Pos = -40;
+				truckPos = -10;
+				
+				var innerRightEnd = rightRoadInnerRightLane.getPath().getAt(rightRoadInnerRightLane.getPath().getLength()-1);
+  				var outerRightEnd = rightRoadOuterRightLane.getPath().getAt(rightRoadOuterRightLane.getPath().getLength()-1);
+  				
+  				interval = window.setInterval(function() {   				
+    				carPos += 0.2;
+    				car2Pos += 0.15;
+    				truckPos += 0.1;
+    				var newCarPos = rightRoadInnerRightLane.GetPointAtDistance(carPos);
+    				var newCar2Pos = rightRoadInnerRightLane.GetPointAtDistance(car2Pos);
+    				var newTruckPos = rightRoadOuterRightLane.GetPointAtDistance(truckPos);
+					car.setPosition(newCarPos);
+					car2.setPosition(newCar2Pos);
+					truck.setPosition(newTruckPos);
+  				}, 10);
+			}
+			
+    	</script>
+	</head>
+  	
+  	<body>
+    	<div id="map-canvas"/>
+  	</body>
+</html>
+
+
+
+
+
